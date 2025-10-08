@@ -1,103 +1,83 @@
+"use client"
+
 import Image from "next/image";
+import { useTransform, useScroll, MotionValue, motion } from "framer-motion"
+import Lenis from 'lenis'
+import { useEffect, useRef } from "react";
+import useDimension from "./hook/useDimension";
+
+const images = [
+  "1.png",
+  "2.png",
+  "3.png",
+  "4.png",
+  "5.png",
+  "6.png",
+  "7.png",
+  "8.png",
+  "9.png",
+  "10.png",
+  "11.png",
+  "12.png",
+]
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  //"container" é uma referência para o contêiner principal da galeria. É usada para conectar o useScroll ao elemento exato que você quer monitorar.
+  const container = useRef(null);
+  //Usa o hook "useDimension" para obter a altura da janela atual (innerHeight).
+  const { height } = useDimension();
+  //🌀 "useScroll" cria um valor reativo (scrollYProgress), faz com que a animação ocorra do topo ao final da viewport e, inversamente.
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ['start end', 'end start']
+  })
+  //Criando animações diferentes para cada "column".
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, height * 2])
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, height * 2.25])
+  const y3 = useTransform(scrollYProgress, [0, 1], [0, height * 1.25])
+  const y4 = useTransform(scrollYProgress, [0, 1], [0, height * 3])
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  //Iniciamos o loop de atualização, a cada frame, do Lenis para ele ativar o scroll com suavização.
+  useEffect(() => {
+    const lenis = new Lenis();
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+  }, [])
+
+  return (
+    <main>
+      <div className="h-[100vh] bg-white" />
+      <div ref={container} className="h-[175vh] bg-[rgb(45, 45, 45)] flex gap-[2vw] p-[2vw] box-border overflow-hidden">
+        <Column images={[images[0], images[1], images[2]]} y={y1} />
+        <Column images={[images[3], images[4], images[5]]} y={y2} />
+        <Column images={[images[6], images[7], images[8]]} y={y3} />
+        <Column images={[images[9], images[10], images[11]]} y={y4} />
+      </div>
+      <div className="h-[100vh] bg-white" />
+    </main>
   );
+}
+
+const Column = ({images, y}:{images: string[], y: MotionValue<number>}) => {
+  return (
+    <motion.div style={{y}} className="w-1/4 h-full flex flex-col gap-[2vw] min-w-[250px] relative [&:nth-of-type(1)]:top-[-45%] [&:nth-of-type(2)]:top-[-75%] [&:nth-of-type(3)]:top-[-45%] [&:nth-of-type(4)]:top-[-75%]">
+      {
+        images.map( (src, index) => {
+          return <div className="w-full h-full relative rounded-[1vw] overflow-hidden">
+            <Image
+              src={`/images/${src}`}
+              fill
+              alt="image"
+              className="object-cover"
+            />
+          </div>
+        })
+      }
+    </motion.div>
+  )
 }
