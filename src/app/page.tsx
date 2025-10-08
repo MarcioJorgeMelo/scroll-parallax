@@ -68,7 +68,7 @@ const Column = ({images, y}:{images: string[], y: MotionValue<number>}) => {
     <motion.div style={{y}} className="w-1/4 h-full flex flex-col gap-[2vw] min-w-[250px] relative [&:nth-of-type(1)]:top-[-45%] [&:nth-of-type(2)]:top-[-75%] [&:nth-of-type(3)]:top-[-45%] [&:nth-of-type(4)]:top-[-75%]">
       {
         images.map( (src, index) => {
-          return <div className="w-full h-full relative rounded-[1vw] overflow-hidden">
+          return <div key={index} className="w-full h-full relative rounded-[1vw] overflow-hidden">
             <Image
               src={`/images/${src}`}
               fill
